@@ -1,0 +1,92 @@
+<head>
+  <!-- Plotly.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+  <!-- Plotly chart will be drawn inside this DIV -->
+  <div id="myDiv"></div>          
+          
+  <script>
+    function groupBy(list, keyGetter) {
+        const map = new Map();
+        list.forEach((item) => {
+            const key = keyGetter(item);
+            const collection = map.get(key);
+            if (!collection) {
+                map.set(key, [item]);
+            } else {
+                collection.push(item);
+            }
+        });
+        return map;
+    }
+
+    Plotly.d3.csv('wine_clean.csv', (err, data) => {
+      const grouped_by_handle = groupBy(data, review => review.taster_twitter_handle);
+
+      var xData = [];
+      var yData = [];
+      for (var handle of grouped_by_handle.keys()) {
+        xData.push(handle);
+        handle_items = grouped_by_handle.get(handle);
+
+        const review_points = handle_items.map(review => review.points);
+
+
+        yData.push(review_points);
+      }
+
+      var colors = ['rgba(93, 164, 214, 0.5)', 'rgba(255, 144, 14, 0.5)', 'rgba(44, 160, 101, 0.5)', 'rgba(255, 65, 54, 0.5)', 'rgba(207, 114, 255, 0.5)', 'rgba(127, 96, 0, 0.5)', 'rgba(255, 140, 184, 0.5)', 'rgba(79, 90, 117, 0.5)', 'rgba(222, 223, 0, 0.5)'];
+
+      var data = [];
+
+      for ( var i = 0; i < xData.length; i ++ ) {
+        var result = {
+          type: 'box',
+          y: yData[i],
+          name: xData[i],
+          boxpoints: 'all',
+          jitter: 0.5,
+          whiskerwidth: 0.2,
+          fillcolor: 'cls',
+          marker: {
+            size: 2
+          },
+          line: {
+            width: 1
+          }
+        };
+        data.push(result);
+      };
+
+      layout = {
+          title: 'Wine Reviews by Twitter Handle',
+          yaxis: {
+              autorange: true,
+              showgrid: true,
+              zeroline: true,
+              dtick: 5,
+              gridcolor: 'rgb(255, 255, 255)',
+              gridwidth: 1,
+              zerolinecolor: 'rgb(255, 255, 255)',
+              zerolinewidth: 2
+          },
+          margin: {
+              l: 40,
+              r: 30,
+              b: 80,
+              t: 100
+          },
+          paper_bgcolor: 'rgb(243, 243, 243)',
+          plot_bgcolor: 'rgb(243, 243, 243)',
+          showlegend: false
+      };
+
+      Plotly.newPlot('myDiv', data, layout);
+
+    });
+
+  </script>
+</body>
