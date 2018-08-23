@@ -1,0 +1,45 @@
+body {
+    padding-top: 30px;
+    background-image: url("https://st.depositphotos.com/1010104/4200/v/950/depositphotos_42006227-stock-illustration-abstract-wine-background.jpg");
+    background-position-y: 40%
+}
+
+.navbar {
+    position: fixed;
+    float: left;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+#filter_container {
+    background-color: maroon;
+    position: sticky;
+    height: 96%;
+}
+
+#svg {
+    background-color: blueviolet;
+    height: 60%;
+}
+
+#multiaxis {
+    background-color: maroon;
+    height: 91%
+}
+
+#wiki-info {
+    height: 38%;
+}
+
+.varietals {
+    margin: 100 30 auto 25;
+}
+
+.footer {
+    z-index: 2;
+    background-color: rgb(27, 25, 25);
+    height: 5%;
+    position: sticky;
+    bottom: 0%
+}
