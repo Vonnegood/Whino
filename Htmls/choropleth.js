@@ -13,13 +13,13 @@ var darkmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?
 var chosenVariety = document.getElementById["variety"]
 
 function getColor(d) {
-  return d > 1000 ? '#800026' :
+  return d > 1000 ? '#800000' :
          d > 500  ? '#BD0026' :
          d > 200  ? '#E31A1C' :
          d > 100  ? '#FC4E2A' :
          d > 50   ? '#FD8D3C' :
          d > 20   ? '#FEB24C' :
-         d > 10   ? '#FED976' :
+         d > 10   ? '#fad6a5' :
                     '#FFEDA0';
 }
 
@@ -40,31 +40,43 @@ d3.csv("../Resources/wine_reviews_kaggle.csv").then(function(reviewData) {
 
   }, {})
 
+//   console.log(counts)
+
   CombinedData.features = CombinedData.features.map(datum => {
-      if (!datum.properties)
+      if (!datum.properties) {
+          datum.properties = {counts: undefined}
           return datum
+      }
       datum.properties.counts = counts[datum.properties.name]
+      if(counts[datum.properties.name])
+        delete counts[datum.properties.name]
       return datum
   })
+
+  console.log(counts)
+
+
 
   function style(feature) {
     return {
         fillColor: getColor(feature.properties.counts),
         weight: 2,
         opacity: 1,
-        color: 'blue',
+        color: 'white',
         dashArray: "3",
         fillOpacity: 0.7
     }
   }
-  L.geoJson(CombinedData, {style: style}).addTo(MyMap); //, {filter: chosenVariety} to filter the geoJson
+  var geojson;
+
+  geojson = L.geoJson(CombinedData, {style: style, onEachFeature: onEachFeature}).addTo(MyMap); //, {filter: chosenVariety} to filter the geoJson
   
   function highlightFeature(e) {
     var layer = e.target;
 
     layer.setStyle({
         weight: 5,
-        color: "#666",
+        color: "#722f37",
         dashArray: '',
         fillOpacity: 0.7
     });
@@ -72,14 +84,14 @@ d3.csv("../Resources/wine_reviews_kaggle.csv").then(function(reviewData) {
     if (!L.Browser.ie && !L.Browser.opera && L.Browser.edge) {
         layer.bringToFront();
     }
-  }
+}
 
   function resetHighlight(e) {
     geojson.resetStyle(e.target);
   }
 
   function zoomToFeature(e) {
-    map.fitBounds(e.target.getBounds());
+    MyMap.fitBounds(e.target.getBounds());
 }
 
 function onEachFeature(feature, layer) {
@@ -90,8 +102,41 @@ function onEachFeature(feature, layer) {
   });
 }
 
-geojson = L.geoJson(statesData, {
-  style: style,
-  onEachFeature: onEachFeature
-}).addTo(map);
+var info = L.control();
+
+info.onAdd = function (MyMap) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+    this._div.innerHTML = '<h4>Amount of Wine Reviews</h4>' +  (props ?
+        '<b>' + props.name + '</b><br />' + props.counts + ' people / mi<sup>2</sup>'
+        : 'Hover over a state');
+};
+
+info.addTo(MyMap);
+
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (MyMap) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        labels = [];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(MyMap);
+
 });
