@@ -13,12 +13,12 @@ var darkmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?
 var chosenVariety = document.getElementById["variety"]
 
 function getColor(d) {
-  return d > 1000 ? '#800000' :
-         d > 500  ? '#BD0026' :
-         d > 200  ? '#E31A1C' :
-         d > 100  ? '#FC4E2A' :
-         d > 50   ? '#FD8D3C' :
-         d > 20   ? '#FEB24C' :
+  return d > 10000 ? '#800000' :
+         d > 1000  ? '#BD0026' :
+         d > 500  ? '#E31A1C' :
+         d > 200  ? '#FC4E2A' :
+         d > 100   ? '#FD8D3C' :
+         d > 50   ? '#FEB24C' :
          d > 10   ? '#fad6a5' :
                     '#FFEDA0';
 }
@@ -44,7 +44,7 @@ d3.csv("../Resources/wine_reviews_kaggle.csv").then(function(reviewData) {
 
   CombinedData.features = CombinedData.features.map(datum => {
       if (!datum.properties) {
-          datum.properties = {counts: undefined}
+          datum.properties = {counts: "0"}
           return datum
       }
       datum.properties.counts = counts[datum.properties.name]
@@ -73,6 +73,7 @@ d3.csv("../Resources/wine_reviews_kaggle.csv").then(function(reviewData) {
   
   function highlightFeature(e) {
     var layer = e.target;
+    info.update(layer.feature.properties);
 
     layer.setStyle({
         weight: 5,
@@ -88,6 +89,7 @@ d3.csv("../Resources/wine_reviews_kaggle.csv").then(function(reviewData) {
 
   function resetHighlight(e) {
     geojson.resetStyle(e.target);
+    info.update();
   }
 
   function zoomToFeature(e) {
@@ -105,7 +107,7 @@ function onEachFeature(feature, layer) {
 var info = L.control();
 
 info.onAdd = function (MyMap) {
-    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this._div = L.DomUtil.create('div', 'info');
     this.update();
     return this._div;
 };
@@ -113,7 +115,7 @@ info.onAdd = function (MyMap) {
 // method that we will use to update the control based on feature properties passed
 info.update = function (props) {
     this._div.innerHTML = '<h4>Amount of Wine Reviews</h4>' +  (props ?
-        '<b>' + props.name + '</b><br />' + props.counts + ' people / mi<sup>2</sup>'
+        '<b>' + props.name + '</b><br />' + props.counts + ' Wines Reviewed'
         : 'Hover over a state');
 };
 
@@ -124,7 +126,7 @@ var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (MyMap) {
 
     var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        grades = [0, 10, 50, 100, 200, 500, 1000, 10000],
         labels = [];
 
     // loop through our density intervals and generate a label with a colored square for each interval
