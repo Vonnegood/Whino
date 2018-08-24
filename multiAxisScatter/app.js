@@ -117,7 +117,7 @@ var toolTip = d3.tip()
 .attr("class", "tooltip")
 .offset([120, -80])
 .html(function (d) {
-return (`<p> ${d.title} <br> ${xlabel} ${d[chosenXAxis]} <br> ${ylabel} ${d[chosenYAxis]} <br> ${rlabel} $${d[radius]} </p > `); 
+return (`<p> ${d.title} <br> Varietal: ${d.variety} <br> Region ${d.region_2} <br> Points Awarded: ${d.points} <br> Price: $${d.price} </p>`); 
 }); 
 
 circlesGroup.call(toolTip); 
