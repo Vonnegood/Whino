@@ -39,8 +39,8 @@ def make_tables():
 @app.route("/")
 def index():
     """Return the homepage."""
-    # return render_template("index.html")
-    return "hey"
+    return render_template("index.html")
+    # return "hey"
 
 
 

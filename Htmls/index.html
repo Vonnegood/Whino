@@ -38,10 +38,13 @@
             <li class="nav-item">
               <a class="nav-link" href="Multiaxis.html">Scatter Plot</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/metadata">Metadata</a>
+              </li>
           </ul>
-          <form class="form-inline my-2 my-md-0">
+          <!-- <form class="form-inline my-2 my-md-0">
             <input class="form-control" type="text" placeholder="Search">
-          </form>
+          </form> -->
         </div>
       </nav>
 
@@ -64,4 +67,6 @@
 <script src= "config.js"></script>
 <script type="text/javascript" src="../Resources/combined.js"></script>
 <script src="choropleth.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
 </html>

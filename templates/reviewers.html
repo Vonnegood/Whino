@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Who Reviews the Reviewers?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Wines</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarsExample03">
+    <ul class="navbar-nav mr-auto">
+      <div class="collapse navbar-collapse" id="navbarsExample03">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/Reviewers">Reviewers</a>
+          </li>
+          <li class="nav-item" >
+            <a class="nav-link" href="/Multiaxis">Scatter Plot</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/metadata">Metadata</a>
+            </li>
+        </ul>
+      </div>
+  </div>
+</nav>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="graph" id="myDiv"></div>
+
+
+        <script>
+          function groupBy(list, keyGetter) {
+              const map = new Map();
+              list.forEach((item) => {
+                  const key = keyGetter(item);
+                  const collection = map.get(key);
+                  if (!collection) {
+                      map.set(key, [item]);
+                  } else {
+                      collection.push(item);
+                  }
+              });
+              return map;
+          }
+      
+          Plotly.d3.csv('../static/Resources/wine_clean.csv', (err, data) => {
+            const grouped_by_handle = groupBy(data, review => review.taster_twitter_handle);
+      
+            var xData = [];
+            var yData = [];
+            for (var handle of grouped_by_handle.keys()) {
+              xData.push(handle);
+              handle_items = grouped_by_handle.get(handle);
+      
+              const review_points = handle_items.map(review => review.points);
+      
+      
+              yData.push(review_points);
+            }
+      
+            var colors = ['rgba(93, 164, 214, 0.5)', 'rgba(255, 144, 14, 0.5)', 'rgba(44, 160, 101, 0.5)', 'rgba(255, 65, 54, 0.5)', 'rgba(207, 114, 255, 0.5)', 'rgba(127, 96, 0, 0.5)', 'rgba(255, 140, 184, 0.5)', 'rgba(79, 90, 117, 0.5)', 'rgba(222, 223, 0, 0.5)'];
+      
+            var data = [];
+      
+            for ( var i = 0; i < xData.length; i ++ ) {
+              var result = {
+                type: 'box',
+                y: yData[i],
+                name: xData[i],
+                boxpoints: 'all',
+                jitter: 0.5,
+                whiskerwidth: 0.2,
+                fillcolor: 'cls',
+                marker: {
+                  size: 2
+                },
+                line: {
+                  width: 1
+                }
+              };
+              data.push(result);
+            };
+      
+            layout = {
+                title: 'Wine Reviews by Twitter Handle',
+                yaxis: {
+                    autorange: true,
+                    showgrid: true,
+                    zeroline: true,
+                    dtick: 5,
+                    gridcolor: 'rgb(255, 255, 255)',
+                    gridwidth: 1,
+                    zerolinecolor: 'rgb(255, 255, 255)',
+                    zerolinewidth: 2
+                },
+                margin: {
+                    l: 40,
+                    r: 30,
+                    b: 80,
+                    t: 130
+                },
+                paper_bgcolor: 'rgb(243, 243, 243)',
+                plot_bgcolor: 'rgb(243, 243, 243)',
+                showlegend: false
+            };
+      
+            Plotly.newPlot('myDiv', data, layout);
+      
+          });
+      
+        </script>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+</html>
